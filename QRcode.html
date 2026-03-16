@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="QRcode.css">
+    <link rel="shortcut icon" href="./Icons/logo.webp" class="logo" type="image/x-icon">
+    <title>PhonePe: UPI Payments, Investment, Insurance, Recharges, DTH &amp; More</title>
+</head>
+
+<body>
+    <main>
+        <div class="top">
+            <img src="./Icons/back.svg" class="icon">
+            <img src="icons/help.svg" class="icon">
+        </div>
+        <div class="profile">
+            <div class="avatar">+</div>
+            <div class="profile-details">
+                <b id="phoneno"></b>
+                <P>Update profile details</P>
+            </div>
+            <div class="manage">Manage</div>
+        </div>
+        <div class="payment-limit">
+
+            <!-- Toggle row -->
+            <div class="payment-limit-row">
+                <label for="paymentToggle">Payment limit</label>
+
+                <div id="paymentToggle" class="toggle">
+                    <div class="toggle-circle"></div>
+                </div>
+            </div>
+
+            <!-- Amount section -->
+            <div id="amountBox" class="amount-box">
+                <label for="amount">Amount:</label>
+                <input id="amount" type="text" inputmode="numeric" placeholder="0" id="amount" disabled />
+            </div>
+            <button id="save"></button>
+        </div>
+
+        <div class="receive-card">
+            <div>
+                <h4>Receive Money on PhonePe</h4>
+                <p>Link your UPI number to receive money</p>
+            </div>
+            <button id="proceed">proceed</button>
+        </div>
+        <div class="qr-code">
+            <div class="bank">
+                <img id="Banklogo" src="./Icons/SBI.png" alt="bank">
+                <span id="Bankname">State Bank of india-3102</span>
+            </div>
+            <div class="qr"></div>
+            <div class="view-upi">View UPI details</div>
+
+        </div>
+        <div class="manage-payments">
+            <h4>Manage Payments</h4>
+            <p>Get PhonePe Credit Card</p>
+        </div>
+    </main>
+    <script>
+        const Phone = localStorage.getItem("Userphone");
+        const phoneno = document.getElementById('phoneno');
+        phoneno.innerText = Phone;
+
+        const toggle = document.getElementById("paymentToggle");
+        const amountBox = document.getElementById("amountBox");
+        const amountInput = document.getElementById("amount");
+        const save = document.getElementById("save");
+
+        window.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const phone = localStorage.getItem("Userphone");
+                const qrres = await fetch("http://localhost:1300/generate-qr", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ phone })
+
+                });
+                const qrData = await qrres.json();
+                if (qrData.success) {
+                    const qrDiv = document.querySelector(".qr");
+                    const img = document.createElement("img");
+                    img.src = qrData.qr;
+                    qrDiv.appendChild(img);
+                    console.log('qr code generated');
+                }
+                else {
+                    console.log('failed to generate qr-code');
+
+                }
+            } catch (err) {
+
+            }
+            try {
+                const res = await fetch(`http://localhost:1300/payment-limit/${Phone}`);
+                const data = await res.json();
+
+                if (data.success && data.paymentLimit.enabled) {
+                    isLimitOn = true;
+                    isPaymentLimitSaved = true;
+
+                    toggle.classList.add("on");
+                    amountBox.style.display = "flex";
+                    amountInput.disabled = false;
+                    amountInput.value = data.paymentLimit.amount.toLocaleString("en-IN");
+                    save.style.display = "block";
+                    updateButtonText();
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        });
+
+
+        let isLimitOn = false;
+
+        // default hidden
+        amountBox.style.display = "none";
+        save.style.display = "none";
+
+        toggle.addEventListener("click", async () => {
+            isLimitOn = !isLimitOn;
+            toggle.classList.toggle("on", isLimitOn);
+
+            if (isLimitOn) {
+                // 🔓 TURN ON
+                amountBox.style.display = "flex";
+                save.style.display = "block";
+                amountInput.disabled = false;
+            } else {
+                // 🔒 TURN OFF
+                amountBox.style.display = "none";
+                save.style.display = "none";
+                amountInput.disabled = true;
+                amountInput.value = "";
+
+                isPaymentLimitSaved = false;
+                updateButtonText();
+
+                // ✅ IMMEDIATE DB UPDATE
+                await updateLimitInDB(false, 0);
+                console.log("🔒 Payment limit disabled in DB");
+            }
+        });
+        async function updateLimitInDB(limitOn, amount = 0) {
+            try {
+                const payload = {
+                    phone: Phone,
+                    limitOn,
+                    limitAmount: amount
+                };
+
+                const res = await fetch("http://localhost:1300/payment-limit", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (!data.success) {
+                    console.log("❌ Failed to update limit");
+                }
+            } catch (err) {
+                console.log("❌ Error updating limit", err);
+            }
+        }
+
+
+        amountInput.addEventListener("input", (e) => {
+            // remove non-digits
+            let value = e.target.value.replace(/[^0-9]/g, "");
+
+            if (value === "") {
+                e.target.value = "";
+                return;
+            }
+
+            // format with commas (Indian format)
+            e.target.value = formatIndianNumber(value);
+        });
+
+        // Indian number format function
+        function formatIndianNumber(num) {
+            let x = num.toString();
+            let lastThree = x.slice(-3);
+            let otherNumbers = x.slice(0, -3);
+
+            if (otherNumbers !== "")
+                lastThree = "," + lastThree;
+
+            return otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+        }
+        const amount = document.getElementById('amount');
+
+        let isPaymentLimitSaved = false;
+        save.innerText = "save";
+        save.addEventListener("click", async () => {
+            try {
+                let rawAmount = amountInput.value.replace(/,/g, ""); // 🔥 fix
+
+                if (isLimitOn && (!rawAmount || Number(rawAmount) <= 0)) {
+                    alert("Enter a valid amount");
+                    return;
+                }
+
+                const payload = {
+                    phone: Phone,
+                    limitOn: isLimitOn,
+                    limitAmount: isLimitOn ? Number(rawAmount) : 0
+                };
+
+                const res = await fetch("http://localhost:1300/payment-limit", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert("Payment limit saved ✅");
+                    isPaymentLimitSaved = true;
+                    updateButtonText();
+                    window.location.href = "Main.html";
+                }
+                else {
+                    console.log('data.message', data.message);
+
+                }
+
+            } catch (err) {
+                console.log("error", err);
+            }
+        });
+        function updateButtonText() {
+            save.innerText = isPaymentLimitSaved ? "UPDATE" : "SAVE";
+        }
+
+    </script>
+</body>
+
+</html>

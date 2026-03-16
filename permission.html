@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhonePe: UPI Payments, Investment, Insurance, Recharges, DTH &amp; More</title>
+    <link rel="stylesheet" href="permission.css">
+    <link rel="shortcut icon" href="./Icons/logo.webp" class="logo" type="image/x-icon">
+</head>
+
+<body>
+    <main>
+
+        <div class="container">
+            <h2>PhonePe needs a few permissions to get you started</h2>
+            <div class="section1">
+                <b>Device State</b>
+                <div class="icon">
+                    <img class="image" src="./Icons/security.svg" alt="security">
+                    <div class="item">
+                        <p>Secure UPI Payments</p>
+                        <p>Allow PhonePe to access and verify your device and SIM details for using UPI payments (as
+                            mandated by
+                            NPCI)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="section2">
+                <b>Text Message(SMS)</b>
+                <div class="icon">
+                    <img class="image" src="./Icons/verification.svg" alt="verifictaion">
+                    <div class="item">
+                        <p>Verification</p>
+                        <p>Allow PhonePe to send SMSs (for UPI registration) and read your transactional messages (for
+                            OTPs)
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="section3">
+                <b>Payment Reminders</b>
+                <div class="icon">
+                    <img class="image" src="./Icons/security.svg" alt="verifictaion">
+                    <div class="item">
+                        <p>Allow us to access your text messages to fetch your bills and remind you on time.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="section4">
+                <div class="item">
+
+                    <img class="image" src="./Icons/rupee.svg" alt="rupee">
+                    <div class="icon">
+                        <p>Get Financial Products Suggestions </p>
+                        <p>Allow us to access SMS data stored on your device and suggest financial products.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="section5">
+            <button id="AllowAccess" type="button">Allow Access</button>
+            <button id="Managepermissions" type="button">Manage permissions</button>
+        </div>
+    </main>
+    <script>
+        const AllowAccess = document.getElementById('AllowAccess');
+        const Managepermissions = document.getElementById('Managepermissions');
+        AllowAccess.addEventListener("click", async () => {
+            window.location.href = "pin.html";
+        });
+        Managepermissions.addEventListener("click", async () => {
+            window.location.href = "pin.html";
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,96 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 3.5rem;
+}
+
+.top b {
+    font-size: clamp(1rem, 2vw, 3rem);
+}
+
+.top :nth-child(2) {
+    font-size: clamp(0.5rem, 2vw, 1.5rem);
+}
+
+.top :nth-child(3) {
+    font-size: clamp(0.5rem, 2vw, 1.3rem);
+    color: #7B2CBF;
+    font-weight: bold;
+}
+
+.input {
+    position: relative;
+    width: clamp(15.625rem, 90vw, 25rem);
+    display: grid;
+    place-self: center;
+}
+
+.input input {
+    width: 60%;
+    /* padding: 1rem 2.5rem; */
+    padding: 0.75rem 1rem 0.75rem 2.8rem;
+    /* space for icon */
+    border: 0.15rem solid #7B2CBF;
+    border-radius: 0.6rem;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+}
+
+.search-icon {
+    position: absolute;
+    left: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.2rem;
+    height: 1.2rem;
+    color: #7B2CBF;
+    pointer-events: none;
+    /* click goes to input */
+}
+
+.banks {
+    margin-top: 3rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.bank {
+    flex: 0 0 calc(33.333% - 1rem);
+    max-width: calc(33.333% - 1rem);
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+
+}
+
+/* icon */
+.icon {
+    display: block;
+    margin: 0 auto;
+    width: clamp(3rem, 10vw, 4.5rem);
+    height: clamp(3rem, 10vw, 4.5rem);
+    object-fit: contain;
+    padding: 0.5rem;
+    border: 0.15rem solid #7B2CBF;
+    border-radius: 1rem;
+}
+
+.bank:hover {
+    transform: scale(1.1);
+}
+
+
+/* bank name */
+.bank p {
+    margin-top: 0.5rem;
+    font-weight: bold;
+    font-size: clamp(0.7rem, 2.5vw, 1rem);
+    line-height: 1.2;
+}

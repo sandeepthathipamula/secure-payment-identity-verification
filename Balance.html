@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhonePe: UPI Payments, Investment, Insurance, Recharges, DTH &amp; More</title>
+    <link rel="shortcut icon" href="./Icons/logo.webp" class="logo" type="image/x-icon">
+    <link rel="stylesheet" href="Balance.css">
+</head>
+
+<body>
+    <header class="top">
+        <img id="navigation" src="icons/back.svg" class="icon">
+        <h2>check balance</h2>
+        <img src="icons/help.svg" class="icon">
+    </header>
+    <main class="container">
+        <div class="cashback-card">
+            <div>
+                <h3>Up to ₹100* cashback</h3>
+                <p>Save your VISA card and earn</p>
+            </div>
+            <img src="./Icons/Rupay.svg" alt="Rupay-Icon" class="icon">
+        </div>
+        <div id="Banklogo" class="list-item">
+            <div class="left">
+                <img id="Bank1" alt="Banklogo">
+            </div>
+            <div>
+                <b id="Bankname1">State Bank Of India</b>
+                <p>Bank Account</p>
+            </div>
+            <img src="./Icons/Right-arrow.svg" alt="Right-arrow" id="icon">
+        </div>
+        <div class="list-item">
+            <div class="left">
+                <img src="./Icons/UPI Lite.png" alt="Upi-lite logo">
+            </div>
+            <div>
+                <b>UPI Lite</b>
+                <p>Pin-less payments up to ₹1,000</p>
+            </div>
+            <span class="action">Try Now</span>
+        </div>
+        <div class="list-item">
+            <div class="left">
+                <img src="./Icons/wallet.svg" alt="wallet">
+            </div>
+            <div>
+                <b>Phone-pe wallet</b>
+                <p>Balance:₹0</p>
+            </div>
+            <span class="action">Activate</span>
+        </div>
+        <div class="list-item">
+            <div class="left">
+                <img src="./Icons/plus.svg" alt="plus">
+            </div>
+            <div>
+                <b>Add UPI account</b>
+                <p>RuPay card, bank account & more</p>
+            </div>
+            <img src="./Icons/Right-arrow.svg" alt="">
+        </div>
+
+
+        <div id="Balance-page" class="Balance-page">
+            <div class="success-circle">✓</div>
+            <h2>Balance check successful</h2>
+            <div class="banksection">
+                <img id="bankicon" alt="SBI" class="icon">
+                <p id="bank" class="bank"></p>
+            </div>
+            <p>Available Balance </p>
+            <div id="Balance" class="amount"></div><br><br>
+            <div class="divider"></div>
+            <div class="slider">
+                <img src="./Icons/Feature2.png">
+                <img src="./Icons/Feature1.png">
+                <img src="./Icons/Feature3.png">
+                <img src="./Icons/Feature4.png">
+                <img src="./Icons/Feature5.png">
+            </div>
+
+            <button id="done" class="done">DONE</button>
+        </div>
+
+    </main>
+    <script>
+        const Banklogo = document.getElementById('Banklogo');
+        const Balancepage = document.getElementById('Balance-page');
+        Balancepage.style.display = "none";
+        Banklogo.addEventListener("click", async () => {
+            const phone = localStorage.getItem("Userphone");
+            const enteredPin = prompt("Enter your UPI PIN ");
+            if (enteredPin === null || enteredPin.trim() === "") {
+                alert("UPI PIN required");
+                return;
+            }
+            // allow only numbers (important)
+            if (!/^\d{4,6}$/.test(enteredPin)) {
+                alert("UPI PIN must be 4–6 digits");
+                return;
+            }
+
+            try {
+                const res = await fetch("http://localhost:1300/check-balance", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        phone,
+                        enteredPin
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    const top = document.querySelector('.top');
+                    const cashbackcard = document.querySelector('.cashback-card');
+                    const listitems = document.querySelectorAll('.list-item');
+
+                    if (top) top.style.display = 'none';
+                    if (cashbackcard) cashbackcard.style.display = 'none';
+
+                    listitems.forEach(item => {
+                        item.style.display = 'none';
+                    });
+                    Object.assign(Balancepage.style, {
+                        display: "flex",
+                        margin: "auto",
+                        width: "clamp(16rem, 40vw, 32rem)",
+                        borderRadius: "1rem",
+                        flexDirection: "column",
+                        justifyContent: "flex-start",
+                        alignItems: "center",
+                        backgroundColor: "#FFFFFF",
+                        boxShadow:
+                            "0 0.4rem 1.4rem rgba(28, 28, 28, 0.15), 0 0.1rem 0.4rem rgba(28, 28, 28, 0.1)"
+                    });
+                } else {
+                    alert(data.message || "Incorrect UPI PIN");
+                    window.location.href = "Main.html";
+                }
+
+            } catch (err) {
+                console.error("Error checking balance", err);
+                alert("Server error");
+            }
+        });
+        const done = document.getElementById('done');
+        done.addEventListener("click", async () => {
+            window.location.href = "main.html";
+        });
+        const navigation = document.getElementById('navigation');
+        navigation.addEventListener("click", async () => {
+            window.location.href = "main.html";
+        });
+        const Balance = document.getElementById('Balance');
+        const bankicon = document.getElementById('bankicon');
+        const bank = document.getElementById('bank'); // assuming this exists
+        const Bank1 = document.getElementById('Bank1');
+        const Bankname1 = document.getElementById('Bankname1');
+
+
+        window.addEventListener("DOMContentLoaded", async () => {
+            const phone = localStorage.getItem("Userphone");
+
+            try {
+                const res = await fetch(`http://localhost:1300/bank/${phone}`);
+                const data = await res.json();
+
+                if (data.success) {
+                    const bankicons = {
+                        "State Bank of India": "./Icons/SBI.png",
+                        "HDFC Bank": "./Icons/HDFC Bank.png",
+                        "ICICI Bank": "./Icons/ICICI.png",
+                        "Axis Bank": "./Icons/AXIS.png",
+                        "Punjab National Bank": "./Icons/Punjab national bank.jpg",
+                        "Bank of Baroda": "./Icons/BOB.png",
+                        "Union Bank of India": "./Icons/union bank.png",
+                        "Canara Bank": "./Icons/CANARA.png",
+                        "Central Bank of India": "./Icons/CBI.png",
+                        "Bank of India": "./Icons/Bank of india.jpg",
+                        "Airtel Payments Bank": "./Icons/Airtel payemts Bank.png"
+                    };
+
+                    const BankName = data.user.bank;
+                    const balance = data.user.balance;
+
+                    console.log("Bank:", BankName, balance);
+
+                    bank.innerText = BankName;
+                    Bankname1.innerText = BankName;
+                    bankicon.src = bankicons[BankName] || "./Icons/bank.png";
+                    Bank1.src = bankicons[BankName] || "./Icons/bank.png";
+                    Balance.innerText = "₹" + balance;
+                }
+
+            } catch (err) {
+                console.log("error", err);
+            }
+        });
+
+
+    </script>
+
+</body>
+
+</html>

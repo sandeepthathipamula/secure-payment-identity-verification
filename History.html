@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhonePe: UPI Payments, Investment, Insurance, Recharges, DTH &amp; More</title>
+    <link rel="shortcut icon" href="./Icons/logo.webp" class="logo" type="image/x-icon">
+
+    <style>
+        /* ---------- RESET ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* ---------- PAGE ---------- */
+        body {
+            background: #f4f6fb;
+        }
+
+        .history-page {
+            margin: auto;
+            width: clamp(18rem, 92vw, 36rem);
+            min-height: 100vh;
+            padding: clamp(1rem, 4vw, 1.6rem);
+        }
+
+        /* ---------- HEADER ---------- */
+        .history-header h2 {
+            font-size: clamp(1.3rem, 5vw, 1.6rem);
+            font-weight: 600;
+            color: #1c1c1c;
+        }
+
+        .history-header p {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.2rem;
+        }
+
+        /* ---------- SEARCH ---------- */
+        .search-box {
+            margin: 1rem 0;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 0.9rem;
+            border: none;
+            outline: none;
+            font-size: 0.95rem;
+            box-shadow: 0 0.2rem 0.8rem rgba(0, 0, 0, 0.08);
+        }
+
+        /* ---------- LIST ---------- */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        /* ---------- ITEM ---------- */
+        .history-item {
+            background: #ffffff;
+            border-radius: 1rem;
+            padding: 0.9rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.08);
+        }
+
+        /* ---------- LEFT ---------- */
+        .left {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+        }
+
+        /* ---------- ICON ---------- */
+        .icon {
+            width: 2.4rem;
+            height: 2.4rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .credit .icon {
+            background: #e9f9f1;
+            color: #1fa971;
+        }
+
+        .debit .icon {
+            background: #fdecec;
+            color: #e63946;
+        }
+
+        /* ---------- TEXT ---------- */
+        .details .title {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #222;
+        }
+
+        .details .meta {
+            font-size: 0.75rem;
+            color: #777;
+            margin-top: 0.15rem;
+        }
+
+        /* ---------- AMOUNT ---------- */
+        .amount {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .credit .amount {
+            color: #1fa971;
+        }
+
+        .debit .amount {
+            color: #e63946;
+        }
+
+        /* ---------- EMPTY ---------- */
+        .empty {
+            text-align: center;
+            color: #777;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="history-page">
+
+        <!-- Header -->
+        <div class="history-header">
+            <h2>Transaction History</h2>
+            <p>Search your payments</p>
+        </div>
+
+        <!-- Search -->
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search transactions">
+        </div>
+
+        <!-- History List (JS fills this) -->
+        <div class="history-list" id="historyList"></div>
+
+        <div class="empty" id="emptyMsg" style="display:none;">
+            No transactions found
+        </div>
+
+    </div>
+    <script>
+        /* =========================
+           ELEMENTS
+        ========================= */
+        const historyList = document.getElementById("historyList");
+        const searchInput = document.getElementById("searchInput");
+        const emptyMsg = document.getElementById("emptyMsg");
+
+        /* =========================
+           STATE (DEDUP BY transactionId)
+        ========================= */
+        const txMap = new Map(); // 🔑 key = transactionId
+        let lastFetchedTime = null;
+        const userPhone = localStorage.getItem("Userphone");
+
+        /* =========================
+           LOAD HISTORY
+        ========================= */
+        async function loadHistory(initial = false) {
+            try {
+                if (!userPhone) {
+                    emptyMsg.style.display = "block";
+                    emptyMsg.innerText = "User not logged in";
+                    return;
+                }
+
+                const url = lastFetchedTime
+                    ? `http://localhost:1300/payment-history/${userPhone}?after=${lastFetchedTime}`
+                    : `http://localhost:1300/payment-history/${userPhone}`;
+
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if (!data.length && initial) {
+                    emptyMsg.style.display = "block";
+                    emptyMsg.innerText = "No transactions found";
+                    return;
+                }
+
+                data.forEach(tx => {
+                    const isDebit = tx.senderPhone === userPhone;
+
+                    txMap.set(tx.transactionId, {
+                        transactionId: tx.transactionId,
+
+                        // ✅ derive type on frontend
+                        type: isDebit ? "debit" : "credit",
+
+                        title: isDebit
+                            ? `Payment to ${tx.name}`
+                            : `Received from ${tx.name}`,
+
+                        displayAmount: `${isDebit ? "-" : "+"} ₹${tx.amount}`,
+
+                        time: formatTime(tx.createdAt),
+                        createdAt: tx.createdAt
+                    });
+                });
+
+                if (data.length) {
+                    lastFetchedTime = data[0].createdAt;
+                }
+
+                renderHistory([...txMap.values()]);
+
+            } catch (err) {
+                console.error("❌ Failed to load history", err);
+            }
+        }
+
+        /* =========================
+           RENDER HISTORY
+        ========================= */
+        function renderHistory(data) {
+            historyList.innerHTML = "";
+
+            if (!data.length) {
+                emptyMsg.style.display = "block";
+                emptyMsg.innerText = "No transactions";
+                return;
+            }
+
+            emptyMsg.style.display = "none";
+
+            data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            data.forEach(tx => {
+                const item = document.createElement("div");
+                item.className = `history-item ${tx.type}`;
+
+                item.innerHTML = `
+            <div class="left">
+                <div class="icon">${tx.type === "credit" ? "↓" : "↑"}</div>
+                <div class="details">
+                    <p class="title">${tx.title}</p>
+                    <p class="meta">${tx.time}</p>
+                </div>
+            </div>
+            <div class="amount ${tx.type}">
+                ${tx.displayAmount}
+            </div>
+        `;
+
+                historyList.appendChild(item);
+            });
+        }
+
+        /* =========================
+           SEARCH
+        ========================= */
+        searchInput.addEventListener("input", () => {
+            const value = searchInput.value.toLowerCase();
+            renderHistory(
+                [...txMap.values()].filter(tx =>
+                    tx.title.toLowerCase().includes(value)
+                )
+            );
+        });
+
+        /* =========================
+           TIME FORMAT
+        ========================= */
+        function formatTime(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const txDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+            const diffDays = Math.floor(
+                (today - txDay) / (1000 * 60 * 60 * 24)
+            );
+
+            const exactTime = date.toLocaleTimeString("en-IN", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: true
+            });
+
+            if (diffDays === 0) return `Today · ${exactTime}`;
+            if (diffDays === 1) return `Yesterday · ${exactTime}`;
+
+            return `${date.toLocaleDateString("en-IN")} · ${exactTime}`;
+        }
+
+        /* =========================
+           INIT + POLLING
+        ========================= */
+        loadHistory(true);
+        setInterval(loadHistory, 3000);
+    </script>
+
+</body>
+
+</html>

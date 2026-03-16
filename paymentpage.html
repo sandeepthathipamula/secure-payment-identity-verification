@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./Icons/logo.webp" class="logo" type="image/x-icon">
+    <title>PhonePe: UPI Payments, Investment, Insurance, Recharges, DTH &amp; More</title>
+    <!-- Razorpay -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- Face API (browser build only) -->
+    <script defer src="https://unpkg.com/face-api.js@0.22.2/dist/face-api.min.js"></script>
+</head>
+<style>
+    /* Page */
+    body {
+        margin: 0;
+        padding: 0;
+        background: #f4f4f4;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont;
+    }
+
+    /* Main card */
+    main {
+        min-height: 100vh;
+        width: clamp(18rem, 92vw, 30rem);
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        border-radius: 1rem;
+        box-shadow: 0 0.25rem 1rem rgba(28, 28, 28, 0.25);
+        overflow: hidden;
+    }
+
+
+    #paymentPage {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    /* Top bar */
+    .container1 {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: clamp(0.6rem, 3vw, 1rem);
+        background-color: #7B2CBF;
+        color: #ffffff;
+    }
+
+    /* Left profile icon */
+    .container1 .icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        border-radius: 50%;
+        padding: 0.4rem;
+    }
+
+    /* Images */
+    img {
+        width: clamp(1.2rem, 5vw, 1.8rem);
+        height: clamp(1.2rem, 5vw, 1.8rem);
+    }
+
+    /* Username & phone */
+    #username,
+    #phone-no {
+        margin: 0;
+        font-size: clamp(0.8rem, 3vw, 1rem);
+        font-weight: 600;
+    }
+
+    /* Right icons */
+    .container1 .item {
+        display: flex;
+        align-items: center;
+        gap: clamp(0.6rem, 3vw, 1.2rem);
+    }
+
+
+    .bottom {
+        margin-top: auto;
+    }
+
+
+    /* Encryption text */
+    .para p {
+        padding: clamp(0.5rem, 2vw, 0.8rem);
+        border-radius: 1rem;
+        background: #f3e8ff;
+        color: #4b0082;
+
+        width: fit-content;
+        margin: 0.5rem auto;
+        font-size: 0.85rem;
+    }
+
+    /* Input row */
+    .container2 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
+
+    /* Input */
+    .container2 input {
+        flex: 1;
+        padding: clamp(0.7rem, 3vw, 1rem);
+        border: 0.1rem solid #d1c4e9;
+        border-radius: 1.2rem;
+        font-size: 1rem;
+        outline: none;
+    }
+
+    .container2 input:focus {
+        border-color: #7B2CBF;
+    }
+
+    /* Pay button */
+    .container2 button {
+        padding: clamp(0.7rem, 3vw, 1rem) clamp(1rem, 4vw, 1.4rem);
+
+        background-color: #7B2CBF;
+        color: #ffffff;
+
+        border: none;
+        border-radius: 1.2rem;
+
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .container2 button:active {
+        transform: scale(0.96);
+    }
+
+    .user-details {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .faceverification {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: clamp(18rem, 90vw, 26rem);
+        padding: 1rem;
+        border-radius: 1rem;
+        text-align: center;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+        margin: auto;
+    }
+
+    video {
+        width: 100%;
+        border-radius: 1rem;
+        margin-top: 1rem;
+    }
+
+    .text {
+        margin-top: 0.8rem;
+        font-size: 0.95rem;
+        opacity: 0.85;
+    }
+
+    canvas {
+        display: none;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    :root {
+        --pp-purple: #5F259F;
+        --pp-purple-light: #E9D9F6;
+        --pp-green: #1FAF38;
+        --pp-gray: #E6E6EB;
+    }
+
+    /* ================== OVERLAY ================== */
+    .overlay {
+        position: fixed;
+        inset: 0;
+        background: #ffffff;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    /* ================== BOX ================== */
+    .box {
+        text-align: center;
+        padding: clamp(1rem, 4vw, 2rem);
+    }
+
+    /* ================== CONNECTING ROW ================== */
+    .lock-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(0.6rem, 2vw, 0.9rem);
+    }
+
+    .lock-row .lock {
+        font-size: clamp(1.4rem, 4vw, 1.8rem);
+    }
+
+    /* ================== PHONEPE BUFFER TOGGLE ================== */
+    .toggle {
+        width: clamp(4.8rem, 12vw, 5.4rem);
+        height: clamp(2.6rem, 7vw, 3.2rem);
+        background: var(--pp-gray);
+        border-radius: 999px;
+        position: relative;
+        overflow: hidden;
+
+        /* 🔥 thickness & depth */
+        box-shadow:
+            inset 0 0.15rem 0.35rem rgba(0, 0, 0, 0.12),
+            inset 0 -0.15rem 0.25rem rgba(255, 255, 255, 0.6);
+    }
+
+    /* ================== SLIDING DOT (BIGGER & SOFTER) ================== */
+    .toggle span {
+        position: absolute;
+        width: clamp(2rem, 6vw, 2.4rem);
+        height: clamp(2rem, 6vw, 2.4rem);
+        background: var(--pp-purple);
+        border-radius: 50%;
+        top: 50%;
+        left: 0.3rem;
+        transform: translateY(-50%);
+        animation: ppSlide 0.85s infinite cubic-bezier(0.4, 0, 0.2, 1);
+
+        /* 🔥 premium knob */
+        box-shadow:
+            0 0.25rem 0.6rem rgba(0, 0, 0, 0.25),
+            inset 0 0.1rem 0.2rem rgba(255, 255, 255, 0.4);
+    }
+
+    /* ================== PHONEPE SLIDE ================== */
+    @keyframes ppSlide {
+        from {
+            left: 0.3rem;
+        }
+
+        to {
+            left: calc(100% - 2.7rem);
+        }
+    }
+
+
+    /* ================== CONNECTING TEXT ================== */
+    .box p {
+        margin-top: clamp(0.9rem, 3vw, 1.2rem);
+        font-size: clamp(0.95rem, 3.5vw, 1rem);
+        color: #5A5A5A;
+    }
+
+    /* ================== SUCCESS ================== */
+    .success {
+        display: none;
+    }
+
+    /* success circle */
+    .circle {
+        width: clamp(4.6rem, 18vw, 6.2rem);
+        height: clamp(4.6rem, 18vw, 6.2rem);
+        background: #7B2CBF;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: scaleIn 0.42s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        margin: auto;
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0.3);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* check icon */
+    svg {
+        width: clamp(2.4rem, 8vw, 3rem);
+        height: clamp(2.4rem, 8vw, 3rem);
+        stroke: #ffffff;
+        stroke-width: 5;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    path {
+        stroke-dasharray: 60;
+        stroke-dashoffset: 60;
+        animation: draw 0.55s ease forwards 0.25s;
+    }
+
+    @keyframes draw {
+        to {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    /* ================== SUCCESS TEXT ================== */
+    .success h3 {
+        margin-top: clamp(1.1rem, 4vw, 1.4rem);
+        font-size: clamp(1.15rem, 4vw, 1.35rem);
+        color: #121212;
+        font-weight: 600;
+    }
+
+    .success p {
+        font-size: clamp(0.88rem, 3.5vw, 0.95rem);
+        color: #6B6B6B;
+    }
+</style>
+
+<body>
+    <main>
+        <div id="paymentPage">
+            <div id="container" class="container1">
+                <div class="icon">
+                    <img src="./Icons/user-icon.svg" alt="user-icon" class="icon">
+                </div>
+                <div class="user-details">
+                    <p id="username"></p>
+                    <p id="phone-no"></p>
+                </div>
+                <div class="item">
+                    <img src="./Icons/clock.svg" alt="clock" id="clock"><br><br>
+                    <img src="./Icons/question-mark.svg" alt="question-mark"><br><br>
+                    <img src="./Icons/menu.svg" alt="menu">
+                </div>
+            </div>
+            <div class="bottom">
+                <div class="para">
+                    <p>your messages or end to end encrypted</p>
+                </div>
+                <div class="container2">
+                    <input type="text" name="amount" id="amount" placeholder="Enter amount or chat">
+                    <button id="pay" type="button">pay</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="faceverification hidden">
+            <h2>Face Verification</h2>
+            <p class="text">Look straight into the camera</p>
+
+            <video id="video" autoplay muted></video>
+            <canvas id="canvas"></canvas>
+
+            <p class="text">Auto capture in 5 seconds…</p>
+        </div>
+        <!-- 🔥 PAYMENT ANIMATION -->
+        <div class="overlay" id="paymentOverlay">
+
+            <!-- CONNECTING -->
+            <div class="box" id="connectingBox">
+                <div class="lock-row">
+                    <div class="toggle"><span></span></div>
+                </div>
+                <p>Connecting securely…</p>
+            </div>
+
+            <!-- SUCCESS -->
+            <div class="box success" id="successBox">
+                <div class="circle">
+                    <svg viewBox="0 0 52 52">
+                        <path d="M14 27 L23 36 L38 18" />
+                    </svg>
+                </div>
+                <h3>Payment Successful</h3>
+            </div>
+
+        </div>
+    </main>
+    <script>
+
+        const senderPhone = localStorage.getItem("Userphone");
+        let paymentAmount = 0;
+        let receiverPhone = "";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const selectedUser = JSON.parse(localStorage.getItem("SelectedUser"));
+
+            if (!selectedUser) {
+                alert("No user selected");
+                return;
+            }
+
+            document.getElementById("username").innerText = selectedUser.name;
+            document.getElementById("phone-no").innerText = selectedUser.phone;
+        });
+
+        const amountInput = document.getElementById("amount");
+
+        amountInput.addEventListener("input", (e) => {
+            let value = e.target.value.replace(/₹|,/g, "").replace(/\D/g, "");
+
+            if (!value) {
+                e.target.value = "₹0";
+                return;
+            }
+
+            e.target.value = "₹" + Number(value).toLocaleString("en-IN");
+        });
+
+        const payBtn = document.getElementById("pay");
+
+        payBtn.addEventListener("click", async () => {
+            const receiver = JSON.parse(localStorage.getItem("SelectedUser"));
+            if (!receiver) return alert("No receiver selected");
+
+            paymentAmount = Number(amountInput.value.replace(/₹|,/g, ""));
+            receiverPhone = receiver.phone;
+
+            if (paymentAmount <= 0) {
+                alert("Enter valid amount");
+                return;
+            }
+            const enteredPin = prompt("🔐 Enter your UPI PIN");
+
+            if (!enteredPin || !/^\d{4}$/.test(enteredPin)) {
+                alert("UPI PIN must be 4 digits");
+                return;
+            }
+
+            /* =========================
+               1️⃣ VERIFY UPI PIN
+            ========================= */
+            let pinData;
+            try {
+                const pinRes = await fetch("http://localhost:1300/check-balance", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        phone: senderPhone,
+                        enteredPin
+                    })
+                });
+
+                pinData = await pinRes.json();
+
+                if (!pinData.success) {
+                    alert("❌ " + pinData.message);
+                    return; // ⛔ STOP
+                }
+
+            } catch (err) {
+                console.error("PIN verification error:", err);
+                alert("Unable to verify UPI PIN");
+                return;
+            }
+
+
+            try {
+                const res = await fetch("http://localhost:1300/pay", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        senderPhone,
+                        receiverPhone,
+                        amount: paymentAmount
+                    })
+                });
+
+                const data = await res.json();
+
+                if (!data.success) {
+                    alert(data.message || "Payment failed");
+                    return;
+                }
+
+                if (data.requireFace === true) {
+                    console.log("🔐 Limit crossed → Face verification");
+                    faceVerification();
+                    return; // ⛔ STOP HERE
+                }
+
+                // ✅ DIRECT PAYMENT
+                if (data.allowPayment === true) {
+                    console.log("✅ Limit OK → Direct payment");
+                    payment();
+                    return;
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("Server error");
+            }
+        });
+
+        /* =========================
+           FACE VERIFICATION
+        ========================= */
+        const video = document.getElementById("video");
+        const canvas = document.getElementById("canvas");
+
+        const paymentPage = document.getElementById("paymentPage");
+        const faceBox = document.querySelector(".faceverification");
+
+        function showFaceBox() {
+            paymentPage.classList.add("hidden");   // ✅ no dot
+            faceBox.classList.remove("hidden");
+        }
+
+        function hideFaceBox() {
+            faceBox.classList.add("hidden");
+            paymentPage.classList.remove("hidden"); // ✅ no dot
+        }
+
+
+        async function loadModels() {
+            await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
+            await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+            await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
+        }
+
+
+        async function startCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+        }
+
+        function stopCamera() {
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(t => t.stop());
+                video.srcObject = null;
+            }
+        }
+
+        async function faceVerification() {
+            showFaceBox();
+            console.log("⏳ Loading models...");
+            await loadModels();
+            console.log("✅ Models loaded");
+
+            console.log("📷 Starting camera...");
+            await startCamera();
+
+            // ✅ wait until video is actually ready
+            await new Promise(resolve => {
+                video.onloadedmetadata = () => resolve();
+            });
+
+            console.log("🎥 Camera ready");
+
+            // auto capture after 5 seconds
+            setTimeout(async () => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(video, 0, 0);
+
+                const imageBase64 = canvas.toDataURL("image/jpeg");
+
+                const detection = await faceapi
+                    .detectSingleFace(video, new faceapi.SsdMobilenetv1Options())
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
+
+                stopCamera();
+
+                if (!detection) {
+                    alert("❌ Face not detected");
+                    return;
+                }
+
+                const descriptor = Array.from(detection.descriptor);
+
+                const res = await fetch("http://localhost:1300/verify-face", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        phone: senderPhone,
+                        image: imageBase64,
+                        descriptor
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.verified) {
+                    hideFaceBox();
+                    payment();
+                } else {
+                    alert("You have no access for payments");
+                    window.location.href = "Main.html";
+                }
+
+            }, 3000);
+        }
+
+        async function payment() {
+            try {
+                const res = await fetch("http://localhost:1300/direct-payment", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        senderPhone,
+                        receiverPhone,
+                        amount: paymentAmount
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    console.log("✅ Payment successful");
+                    setTimeout(() => {
+                        showConnecting();
+                    }, 1000);
+                    setTimeout(() => {
+                        showSuccess();
+                    }, 2000);
+                  
+                    setTimeout(() => {
+                        window.location.href="Main.html";
+                    }, 5000);
+                  
+                } else {
+                    alert("❌ " + (data.message || "Payment failed"));
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("Server error");
+            }
+        }
+
+        function showConnecting() {
+            document.getElementById("paymentOverlay").style.display = "flex";
+            document.getElementById("connectingBox").style.display = "block";
+            document.getElementById("successBox").style.display = "none";
+        }
+
+        // SHOW SUCCESS
+        function showSuccess() {
+            document.getElementById("connectingBox").style.display = "none";
+            document.getElementById("successBox").style.display = "block";
+
+
+        }
+
+
+    </script>
+</body>
+
+</html>

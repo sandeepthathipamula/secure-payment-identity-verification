@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhonePe: UPI Payments, Investment, Insurance, Recharges, DTH &amp; More</title>
+    <link rel="shortcut icon" href="./Icons/logo.webp" class="logo" type="image/x-icon">
+</head>
+<style>
+    main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        border: 0.1rem solid #7B2CBF;
+        box-shadow: 0 0.25rem 1rem rgba(123, 44, 191, 0.25);
+
+        width: clamp(18rem, 90vw, 30rem);
+        padding: clamp(1rem, 4vw, 1.8rem);
+        margin: auto;
+
+        border-radius: 1rem;
+        background: #fff;
+    }
+
+    /* heading */
+    .container .bold {
+        font-size: clamp(1.2rem, 3vw, 2rem);
+        color: #7B2CBF;
+        text-align: center;
+    }
+
+    /* icons row */
+    .icons {
+        display: flex;
+        flex-wrap: wrap;
+        /* IMPORTANT */
+        justify-content: center;
+        gap: clamp(0.8rem, 3vw, 1.2rem);
+    }
+
+    .icons p {
+        font-size: clamp(0.9rem, 3vw, 1.4rem);
+    }
+
+    /* payment icons */
+    .phone-pe,
+    .BHIM,
+    .Google-pay,
+    .paytm {
+        width: clamp(3.5rem, 10vw, 5rem);
+        height: clamp(3.5rem, 10vw, 5rem);
+    }
+
+
+    .input {
+        position: relative;
+
+    }
+
+    .input input {
+        width: 80%;
+        padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+        font-size: clamp(0.9rem, 2.5vw, 1rem);
+        border: 0.15rem solid #7B2CBF;
+        border-radius: 1rem;
+        outline: none;
+    }
+
+
+    .search-icon {
+        position: absolute;
+        top: 50%;
+        left: 0.75rem;
+        transform: translateY(-50%);
+        width: clamp(1rem, 3vw, 1.25rem);
+        height: clamp(1rem, 3vw, 1.25rem);
+        pointer-events: none;
+    }
+
+
+    .payments {
+        font-size: clamp(0.8rem, 3vw, 1.2rem);
+        margin-top: clamp(1rem, 4vw, 2rem);
+    }
+
+
+    .button {
+        display: flex;
+        justify-content: center;
+        margin-top: clamp(15rem, 6vw, 30rem);
+
+    }
+
+
+    .button button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        background: #7B2CBF;
+        color: #ffffff;
+        font-weight: bold;
+        padding: 0.9rem 1.2rem;
+        border: 0.1rem solid #5a189a;
+        border-radius: 1rem;
+        cursor: pointer;
+        font-size: clamp(0.85rem, 2.5vw, 1rem);
+    }
+
+    /* button icon */
+    .button button svg {
+        width: clamp(1.1rem, 3vw, 1.3rem);
+        height: clamp(1.1rem, 3vw, 1.3rem);
+        stroke: currentColor;
+    }
+
+    /* text */
+    .button button span {
+        white-space: nowrap;
+    }
+
+    /* hover */
+    .button button:hover {
+        background: #5a189a;
+    }
+    .contacts{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+<body>
+    <main>
+        <div class="container">
+            <b class="bold">Send Money</b>
+            <div class="icons">
+                <p>To any UPI app</p>
+                <img class="phone-pe" src="./Icons/phone-pe.svg" alt="phone pe">
+                <img class="BHIM" src="./Icons/BHIM logo.png" alt="BHIM logo">
+                <img class="Google-pay" src="./Icons/G pay.png" alt="googlepay">
+                <img class="paytm" src="./Icons/paytm.png" alt="">
+            </div>
+            <div class="input">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"
+                    color="#7B2CBF" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M17 17L21 21" />
+                    <path
+                        d="M19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C15.4183 19 19 15.4183 19 11Z" />
+                </svg>
+                <input type="text" name="search" id="search" required>
+            </div><br><br>
+            <b class="payments">PAYMENTS & CHAT</b>
+            <div id="userList" class="contacts"></div><br>
+            <div class="button">
+                <button type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12.001 5.00003V19.002" />
+                        <path d="M19.002 12.002L4.99998 12.002" />
+                    </svg>
+                    <span>New Payment</span>
+                </button>
+            </div>
+        </div>
+    </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+
+            const phone = localStorage.getItem("Userphone");
+            if (!phone) return console.error("User phone not found");
+
+            try {
+                const res = await fetch("http://localhost:1300/get-users", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ phone }) // ✅ correct variable
+                });
+
+                const data = await res.json();
+                if (!data.success) return;
+
+                const userList = document.getElementById("userList");
+                userList.innerHTML = "";
+
+                data.users.forEach(user => {
+                    const div = document.createElement("div");
+                    div.className = "user";
+
+                    Object.assign(div.style, {
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginTop: "1rem",
+                        gap: "1rem",
+                        padding: "1rem",
+                        border: "0.1rem solid #1c1c1c",
+                        borderRadius: "0.5rem",
+                        boxShadow: "0 0.4rem 1rem rgba(28, 28, 28, 0.15)",
+                        width: "clamp(16rem, 90vw, 22rem)", // ✅ RESPONSIVE
+                        cursor: "pointer",
+                        backgroundColor: "#fff"
+                    });
+
+                    div.innerHTML = `
+                <div class="info">
+                    <p class="name">${user.name}</p>
+                    <p class="phone">${user.phone}</p>
+                </div>
+            `;
+
+                    // 👉 Open common payment page
+                    div.addEventListener("click", () => {
+                        localStorage.setItem("SelectedUser", JSON.stringify(user));
+                        window.location.href = "paymentpage.html";
+                    });
+
+                    userList.appendChild(div);
+                });
+
+            } catch (err) {
+                console.error("Fetch error:", err);
+            }
+        });
+    </script>
+
+</body>
+
+</html>

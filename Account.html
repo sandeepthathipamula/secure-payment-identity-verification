@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhonePe: UPI Payments, Investment, Insurance, Recharges, DTH &amp; More</title>
+    <link rel="stylesheet" href="Account.css">
+    <link rel="shortcut icon" href="./Icons/logo.webp" class="logo" type="image/x-icon">
+
+</head>
+
+<body>
+    <main id="main">
+        <div id="container" class="container">
+            <img src="./Icons/phone-pe.svg" alt="phone-pe icon" class="phone-pe-icon">
+            <h2>Log In to PhonePe</h2>
+            <p><b>We will create an account If you dont have one</b></p>
+            <form id="accounform" method="post">
+                <div class="item">
+                    <label for="mobile number">Enter Mobile Number:</label>
+                    <input id="input" type="tel" name="phone" maxlength="12" required>
+                </div>
+                <button id="proceed" type="button">Proceed</button>
+            </form>
+        </div>
+        <div id="container1" class="container1">
+            <div class="logo">
+                <img src="./Icons/phone-pe.svg" alt="phone-pe logo" class="logo">
+            </div>
+            <h3>Verify your mobile number</h3>
+            <p>This verifies your identity and helps you securely log in to phone-pe</p>
+            <form method="post">
+                <label for="Enter otp">Enter Otp Send to : <span id="userNumber"></span></label>
+                <input id="input1" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6"
+                    placeholder="Enter OTP" />
+                <p id="otpText">
+                    Auto reading OTP:
+                    <span id="otpTimer">01:00</span>
+                </p>
+                <button id="submit" type="button">submit</button>
+            </form>
+        </div>
+    </main>
+    <script>
+        const container = document.getElementById('container');
+        const container1 = document.getElementById('container1');
+        const proceed = document.getElementById('proceed');
+        const submit = document.getElementById('submit');
+        let currentPhone = "";
+        container1.style.display = "none";
+        proceed.addEventListener("click", async () => {
+            const phone = document.getElementById('input').value.trim();
+            localStorage.setItem("Userphone", phone);
+            currentPhone = phone;
+            if (phone !== "") {
+                try {
+               const res =  await fetch("http://localhost:1300/send-phone", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ phone })
+                    });
+                    const data = await res.json();
+
+                    // 🔑 ONLY CHECK
+                    if (data.upiPinExists) {
+                        console.log("UPI PIN is SET");
+                        window.location.href = "Main.html";
+                        return;
+                    }
+
+                    // 🔐 PIN not set → show OTP UI
+                    console.log("UPI PIN NOT SET");
+                    console.log("Phone sent:", phone);
+                    container.style.display = "none";
+                    container1.style.display = "flex";
+                    container1.style.flexDirection = "column";
+                    container1.style.alignItems = "center";
+
+                    const form = container1.querySelector("form");
+                    Object.assign(form.style, {
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        gap: "0.6rem",
+                    });
+
+
+                    document.getElementById("userNumber").innerText = phone;
+                    let timeLeft = 59;
+                    const otpTimer = document.getElementById("otpTimer");
+
+                    const timerInterval = setInterval(() => {
+                        const seconds = String(timeLeft).padStart(2, "0");
+                        otpTimer.textContent = `00:${seconds}`;
+
+                        timeLeft--;
+
+                        if (timeLeft < 0) {
+                            clearInterval(timerInterval);
+                            otpTimer.textContent = "Expired";
+                            otpTimer.style.color = "red";
+                            location.reload();
+                        }
+                    }, 1000);
+
+
+                } catch (err) {
+                    console.error("Fetch error:", err);
+                    alert("Server error");
+                }
+            } else {
+                alert("Please enter phone number");
+            }
+        });
+
+        submit.addEventListener("click", async () => {
+            const otp = document.getElementById('input1').value.trim();
+
+            if (otp !== "") {
+                try {
+                    const res = await fetch("http://localhost:1300/verify-otp", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ phone: currentPhone, otp })
+                    });
+
+                    const data = await res.json();
+
+                    if (data.success) {
+                        console.log("OTP verified:", otp);
+                        alert("otp verified successfully")
+                        const container1 = document.getElementById('container1');
+                        container1.style.display = "none";
+                        const main = document.getElementById("main");
+                        main.style.display = "none";   // hides border + shadow + everything
+
+
+                        Object.assign(document.body.style, {
+                            margin: "0",
+                            height: "100vh",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        });
+
+                        const box = document.createElement("div");
+                        box.className = "box";
+                        box.id = "box";
+
+                        Object.assign(box.style, {
+                            width: "clamp(240px, 90vw, 360px)",
+                            padding: "clamp(16px, 5vw, 28px)",
+                            background: "#ffffff",
+                            borderRadius: "clamp(12px, 4vw, 16px)",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "clamp(12px, 4vw, 16px)",
+                            boxShadow: "0 10px 25px rgba(0,0,0,0.15)"
+                        });
+
+                        document.body.appendChild(box);
+                        /* Icon */
+                        const icon = document.createElement("img");
+                        icon.src = "./icons/sms.svg";
+                        Object.assign(icon.style, {
+                            width: "clamp(40px, 12vw, 56px)",
+                            height: "clamp(40px, 12vw, 56px)"
+                        });
+
+                        box.appendChild(icon);
+                        const bold = document.createElement("b");
+                        bold.innerText = "Allow PhonePe to send SMS";
+                        box.appendChild(bold);
+
+                        /* ===== BUTTON 1 ===== */
+                        const Allow = document.createElement("button");
+                        Allow.textContent = "Allow";
+                        Object.assign(Allow.style, {
+                            width: "100%",
+                            padding: "clamp(10px, 3.5vw, 14px)",
+                            border: "none",
+                            borderRadius: "clamp(6px, 2vw, 8px)",
+                            background: "#7B2CBF",
+                            color: "#ffffff",
+                            fontSize: "clamp(14px, 4vw, 16px)",
+                            cursor: "pointer"
+                        });
+
+                        box.appendChild(Allow);
+
+                        /* ===== BUTTON 2 ===== */
+                        const DontAllow = document.createElement("button");
+                        DontAllow.textContent = "Don't allow";
+                        Object.assign(DontAllow.style, {
+                            width: "100%",
+                            padding: "clamp(10px, 3.5vw, 14px)",
+                            border: "1px solid #cccccc",
+                            borderRadius: "clamp(6px, 2vw, 8px)",
+                            background: "#ffffff",
+                            color: "#000000",
+                            fontSize: "clamp(14px, 4vw, 16px)",
+                            cursor: "pointer"
+                        });
+
+                        box.appendChild(DontAllow);
+
+                        Allow.addEventListener("click", async () => {
+                            const box = document.getElementById('box');
+                            box.style.display = "none";
+                            const box1 = document.createElement("div");
+                            box1.className = "box1";
+                            box1.id = "box1";
+
+                            Object.assign(box1.style, {
+                                width: "clamp(240px, 90vw, 360px)",
+                                padding: "clamp(16px, 5vw, 28px)",
+                                background: "#ffffff",
+                                borderRadius: "clamp(12px, 4vw, 16px)",
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                gap: "clamp(12px, 4vw, 16px)",
+                                boxShadow: "0 10px 25px rgba(0,0,0,0.15)"
+                            });
+
+                            document.body.appendChild(box1);
+                            const icon1 = document.createElement('img');
+                            icon1.src = "./icons/phone.svg";
+                            Object.assign(icon.style, {
+                                width: "clamp(40px, 12vw, 56px)",
+                                height: "clamp(40px, 12vw, 56px)"
+                            });
+                            box1.appendChild(icon1);
+
+                            const bold1 = document.createElement("b");
+                            bold1.innerText = "Allow PhonePe to make and manage phone calls";
+                            box1.appendChild(bold1);
+
+                            const Allow1 = document.createElement("button");
+                            Allow1.textContent = "Allow";
+                            Object.assign(Allow1.style, {
+                                width: "100%",
+                                padding: "clamp(10px, 3.5vw, 14px)",
+                                border: "none",
+                                borderRadius: "clamp(6px, 2vw, 8px)",
+                                background: "#7B2CBF",
+                                color: "#ffffff",
+                                fontSize: "clamp(14px, 4vw, 16px)",
+                                cursor: "pointer"
+                            });
+
+                            box1.appendChild(Allow1);
+
+                            /* ===== BUTTON 2 ===== */
+                            const DontAllow1 = document.createElement("button");
+                            DontAllow1.textContent = "Don't allow";
+                            Object.assign(DontAllow1.style, {
+                                width: "100%",
+                                padding: "clamp(10px, 3.5vw, 14px)",
+                                border: "1px solid #cccccc",
+                                borderRadius: "clamp(6px, 2vw, 8px)",
+                                background: "#ffffff",
+                                color: "#000000",
+                                fontSize: "clamp(14px, 4vw, 16px)",
+                                cursor: "pointer"
+                            });
+
+                            box1.appendChild(DontAllow1);
+                            Allow1.addEventListener("click", async () => {
+                                const box1 = document.getElementById('box1');
+                                box1.style.display = "none";
+                                const box2 = document.createElement("div");
+                                box2.className = "box2";
+                                Object.assign(box2.style, {
+                                    width: "clamp(240px, 90vw, 360px)",
+                                    padding: "clamp(16px, 5vw, 28px)",
+                                    background: "#ffffff",
+                                    borderRadius: "clamp(12px, 4vw, 16px)",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    gap: "clamp(12px, 4vw, 16px)",
+                                    boxShadow: "0 10px 25px rgba(0,0,0,0.15)"
+                                });
+
+                                document.body.appendChild(box2);
+                                const icon2 = document.createElement('img');
+                                icon2.src = "./icons/location.svg";
+                                Object.assign(icon2.style, {
+                                    width: "clamp(40px, 12vw, 56px)",
+                                    height: "clamp(40px, 12vw, 56px)"
+                                });
+                                box2.appendChild(icon2);
+
+                                const bold2 = document.createElement("b");
+                                bold2.innerText = "Allow PhonePe to make and manage phone calls";
+                                box2.appendChild(bold2);
+
+                                const Allow2 = document.createElement("button");
+                                Allow2.textContent = "Allow";
+                                Object.assign(Allow1.style, {
+                                    width: "100%",
+                                    padding: "clamp(10px, 3.5vw, 14px)",
+                                    border: "none",
+                                    borderRadius: "clamp(6px, 2vw, 8px)",
+                                    background: "#7B2CBF",
+                                    color: "#ffffff",
+                                    fontSize: "clamp(14px, 4vw, 16px)",
+                                    cursor: "pointer"
+                                });
+
+                                box2.appendChild(Allow2);
+
+                                /* ===== BUTTON 2 ===== */
+                                const DontAllow2 = document.createElement("button");
+                                DontAllow2.textContent = "Don't allow";
+                                Object.assign(DontAllow2.style, {
+                                    width: "100%",
+                                    padding: "clamp(10px, 3.5vw, 14px)",
+                                    border: "1px solid #cccccc",
+                                    borderRadius: "clamp(6px, 2vw, 8px)",
+                                    background: "#ffffff",
+                                    color: "#000000",
+                                    fontSize: "clamp(14px, 4vw, 16px)",
+                                    cursor: "pointer"
+                                });
+
+                                box2.appendChild(DontAllow2);
+                                Allow2.addEventListener("click", async () => {
+                                    window.location.href = "Main.html";
+
+                                });
+                                DontAllow2.addEventListener("click", async () => {
+                                    alert("click allow to continue")
+                                });
+                            });
+                            DontAllow1.addEventListener("click", async () => {
+                                alert('click alow to continue')
+                            });
+                        });
+
+                        DontAllow.addEventListener("click", async () => {
+                            alert("Click allow to Continue")
+                        });
+                    } else {
+                        alert(data.message || "Invalid OTP");
+                    }
+
+                } catch (err) {
+                    console.error("Error is:", err);
+                    alert("Server error. Try again.");
+                }
+            } else {
+                alert("Please enter OTP");
+            }
+        });
+
+    </script>
+</body>
+
+</html>

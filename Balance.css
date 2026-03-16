@@ -1,0 +1,245 @@
+    body {
+        background: #f7f7f7;
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, sans-serif;
+    }
+
+    .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 0.1rem solid #1C1C1C;
+        border-radius: 0.8rem;
+        box-shadow: 0 0.2rem 0.7rem rgba(28, 28, 28, 0.25);
+        background-color: #FFFFFF;
+        width: 100%;
+        min-height: clamp(3.5rem, 12vh, 6rem);
+
+    }
+
+    .top .icon {
+        width: clamp(1.5rem, 6vw, 2rem);
+        height: clamp(1.5rem, 6vw, 2rem);
+
+    }
+
+    .top h2 {
+        font-size: clamp(1.2rem, 4vw, 2rem);
+        color: #1C1C1C;
+    }
+
+    .cashback-card {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: clamp(0.75rem, 3.5vw, 1.25rem);
+        padding: clamp(0.75rem, 4vw, 1rem);
+        border: 0.1rem solid #1C1C1C;
+        border-radius: 1rem;
+        width: clamp(14rem, 25vw, 28rem);
+        margin: auto;
+        margin-top: clamp(0.75rem, 3.5vw, 1.25rem);
+        background-color: #FFFFFF;
+
+    }
+
+    .cashback-card .icon {
+        width: clamp(2.5rem, 6vw, 4rem);
+        height: clamp(2.5rem, 6vw, 4rem);
+        object-fit: contain;
+    }
+
+    .cashback-card h3 {
+        font-size: clamp(0.5rem, 2.8vw, 1rem);
+
+    }
+
+    .cashback-card p {
+        font-size: clamp(0.5rem, 3.5vw, 0.8rem);
+    }
+
+    .list-item {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        gap: clamp(0.75rem, 3.5vw, 1.25rem);
+        padding: clamp(0.75rem, 4vw, 1rem);
+        border: 0.1rem solid #1C1C1C;
+        border-radius: 1rem;
+        width: clamp(14rem, 25vw, 28rem);
+        margin: auto;
+        margin-top: clamp(0.75rem, 3.5vw, 1.25rem);
+        background-color: #FFFFFF;
+    }
+
+    .list-item img {
+        width: clamp(1.5rem, 6vw, 2rem);
+        height: clamp(1.5rem, 6vw, 2rem);
+    }
+
+    .list-item b {
+        font-size: clamp(0.5rem, 2.8vw, 1rem);
+
+    }
+
+    .list-item p {
+        font-size: clamp(0.5rem, 3.5vw, 0.8rem);
+    }
+
+    .list-item .action {
+        color: #7B2CBF;
+        font-weight: bold;
+        font-size: clamp(0.85rem, 3vw, 1.05rem);
+    }
+
+/* Page wrapper */
+.Balance-page {
+    margin: auto;
+    width: clamp(18rem, 92vw, 32rem);
+    padding: clamp(1.2rem, 4vw, 2rem);
+    border-radius: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(180deg, #ffffff, #faf7ff);
+    border: 0.1rem solid #1C1C1C;
+    box-shadow:
+        0 0.6rem 2rem rgba(28, 28, 28, 0.12);
+}
+
+/* Success icon */
+.success-circle {
+    margin-top: clamp(1rem, 5vw, 2rem);
+    width: clamp(4.2rem, 18vw, 6rem);
+    height: clamp(4.2rem, 18vw, 6rem);
+    background: radial-gradient(circle, #2ecc71, #23a455);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(2.2rem, 8vw, 3rem);
+    box-shadow: 0 0.4rem 1rem rgba(35, 164, 85, 0.35);
+    animation: pulseScale 1.6s ease-in-out infinite;
+}
+
+/* Pulse animation */
+@keyframes pulseScale {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+/* Heading */
+.Balance-page h2 {
+    margin-top: 1rem;
+    font-size: clamp(1.05rem, 5vw, 1.45rem);
+    font-weight: 600;
+    text-align: center;
+    color: #1c1c1c;
+}
+
+/* Bank section */
+.banksection {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.6rem, 3vw, 1.2rem);
+    margin-top: 1rem;
+    background: #ffffff;
+    padding: 0.6rem 1rem;
+    border-radius: 0.8rem;
+    box-shadow: 0 0.2rem 0.6rem rgba(0,0,0,0.08);
+}
+
+.banksection .icon {
+    width: clamp(1.8rem, 6vw, 2.3rem);
+    height: clamp(1.8rem, 6vw, 2.3rem);
+    object-fit: contain;
+}
+
+.bank {
+    font-size: clamp(0.75rem, 3.5vw, 1rem);
+    font-weight: 500;
+    color: #333;
+}
+
+/* Balance label */
+.label {
+    margin-top: 1.2rem;
+    font-size: clamp(0.8rem, 4vw, 1rem);
+    color: #666;
+}
+
+/* Amount */
+.amount {
+    margin-top: 0.3rem;
+    font-size: clamp(1rem, 7vw, 2rem);
+    font-weight: 500;
+    color: #000;
+}
+
+/* Divider */
+.divider {
+    width: 100%;
+    height: 0.08rem;
+    background: linear-gradient(to right, transparent, #ccc, transparent);
+    margin: 1.4rem 0;
+}
+
+/* Slider */
+.slider {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    position: relative;
+    overflow: hidden;
+    border-radius: 1rem;
+    background: #f4f4f4;
+}
+
+.slider img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    animation: fade 25s infinite ease-in-out;
+}
+
+/* Image delays */
+.slider img:nth-child(1) { animation-delay: 0s; }
+.slider img:nth-child(2) { animation-delay: 5s; }
+.slider img:nth-child(3) { animation-delay: 10s; }
+.slider img:nth-child(4) { animation-delay: 15s; }
+.slider img:nth-child(5) { animation-delay: 20s; }
+
+/* Fade animation */
+@keyframes fade {
+    0% { opacity: 0; transform: scale(0.96); }
+    12% { opacity: 1; transform: scale(1); }
+    32% { opacity: 1; }
+    44% { opacity: 0; transform: scale(1.04); }
+    100% { opacity: 0; }
+}
+
+/* Done button */
+.done {
+    margin-top: 1.4rem;
+    width: min(70%, 18rem);
+    padding: clamp(0.8rem, 3vw, 1rem);
+    background: linear-gradient(135deg, #7B2CBF, #9d4edd);
+    color: #fff;
+    font-weight: 600;
+    border-radius: 1rem;
+    border: none;
+    font-size: clamp(0.9rem, 4vw, 1rem);
+    cursor: pointer;
+    box-shadow: 0 0.4rem 1rem rgba(123, 44, 191, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.done:active {
+    transform: scale(0.97);
+    box-shadow: 0 0.2rem 0.6rem rgba(123, 44, 191, 0.25);
+}

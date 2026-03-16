@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhonePe: UPI Payments, Investment, Insurance, Recharges, DTH & More</title>
+    <link rel="stylesheet" href="Bank.css">
+    <link rel="shortcut icon" href="./Icons/logo.webp" type="image/x-icon">
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="top">
+            <b>Add Bank Linked To <span id="usernumber"></span></b>
+            <p>This is required to set your UPI account</p>
+            <p>Use a different mobile number</p>
+        </div>
+
+        <div class="input">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"
+                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 17L21 21" />
+                <path d="M19 11C19 6.58 15.42 3 11 3S3 6.58 3 11s3.58 8 8 8 8-3.58 8-8Z" />
+            </svg>
+            <input type="text" name="bank" placeholder="Search by bank name">
+        </div>
+
+        <div class="banks">
+
+            <div class="bank">
+                <img id="StateBankofIndia" src="./Icons/SBI.png" class="icon">
+                <p>State Bank of India</p>
+            </div>
+
+            <div class="bank">
+                <img id="HDFC Bank" src="./Icons/HDFC Bank.png" class="icon">
+                <p>HDFC Bank</p>
+            </div>
+
+            <div class="bank">
+                <img id="PunjabNationalBank" src="./Icons/Punjab national bank.jpg" class="icon">
+                <p>Punjab National Bank</p>
+            </div>
+
+            <div class="bank">
+                <img id="BankofBaroda" src="./Icons/Bank of Baroda.png" class="icon">
+                <p>Bank of Baroda</p>
+            </div>
+
+            <div class="bank">
+                <img id="UnionBankofIndia" src="./Icons/union bank.png" class="icon">
+                <p>Union Bank of India</p>
+            </div>
+
+            <div class="bank">
+                <img id="CanaraBank" src="./Icons/Canara Bank.png" class="icon">
+                <p>Canara Bank</p>
+            </div>
+
+            <div class="bank">
+                <img id="AirtelPaymentsBank" src="./Icons/Airtel payemts Bank.png" class="icon">
+                <p>Airtel Payments Bank</p>
+            </div>
+
+            <div class="bank">
+                <img id="CentralBankofIndia" src="./Icons/Central bank of india.png" class="icon">
+                <p>Central Bank of India</p>
+            </div>
+
+            <div class="bank">
+                <img id="BankofIndia" src="./Icons/Bank of india.jpg" class="icon">
+                <p>Bank of India</p>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        const banks = document.querySelectorAll('.bank');
+
+        banks.forEach(bank => {
+            bank.addEventListener("click", async () => {
+                const bankName = bank.querySelector("p").innerText.trim();
+                const phone = localStorage.getItem("Userphone");
+                console.log("Bank:", bankName);
+                console.log("User phone:", phone);
+                const ok = confirm("Do you want to save and continue?");
+                try {
+                    const res = await fetch("http://localhost:1300/Verify", {
+                        method: "POST",
+                        headers: { "content-Type": "application/json" },
+                        body: JSON.stringify({
+                            phone: phone,
+                            bank: bankName
+                        })
+                    });
+                    const data = await res.json();
+
+                    if (data.exists) {
+                        alert("Account verified successfully");
+                    } else {
+                        alert(data.message);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Server error");
+                }
+                if (ok) {
+                    window.location.href = "permission.html";
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

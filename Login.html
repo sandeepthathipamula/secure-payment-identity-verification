@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhonePe: UPI Payments, Investment, Insurance, Recharges, DTH &amp; More</title>
+    <link rel="shortcut icon" href="./Icons/logo.webp" class="logo" type="image/x-icon">
+    <script src="https://unpkg.com/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+
+
+</head>
+<style>
+    main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border: 0.1rem solid #7B2CBF;
+        border-radius: 1rem;
+        box-shadow: 0 0.25rem 1rem rgba(123, 44, 191, 0.25);
+        padding: clamp(1rem, 4vw, 1.8rem);
+
+        /* responsive width */
+        width: min(92%, 32rem);
+        margin: auto;
+        margin-top: clamp(3rem, 10vw, 6rem);
+    }
+
+    .Name,
+    .phone-no {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+        max-width: 26rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    label {
+        min-width: 6rem;
+        /* LEFT column width */
+        text-align: right;
+        /* aligns text near input */
+        font-weight: bolder;
+        font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+    }
+
+
+    input {
+        flex: 1;
+        /* fills remaining space */
+        padding: 0.8rem;
+        border: 0.1rem solid #7B2CBF;
+        border-radius: 0.5rem;
+        font-size: clamp(0.9rem, 2.5vw, 1rem);
+        box-shadow: 0 0.4rem 1.2rem rgba(123, 44, 191, 0.25);
+        box-sizing: border-box;
+    }
+
+
+    .logo {
+        width: clamp(4.5rem, 15vw, 6rem);
+        height: auto;
+        margin-bottom: 0.8rem;
+        display: flex;
+        justify-self: center;
+    }
+
+    .bank-select {
+        position: relative;
+        /* 🔥 REQUIRED */
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+        max-width: 26rem;
+    }
+
+
+    .bank-select label {
+        min-width: 6rem;
+        text-align: right;
+    }
+
+    .selected {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border: 0.15rem solid #7B2CBF;
+        padding: 0.6rem;
+        border-radius: 0.7rem;
+        cursor: pointer;
+        background: #fff;
+    }
+
+    .selected img {
+        width: 2rem;
+        height: 2rem;
+        object-fit: contain;
+    }
+
+    .bank-options {
+        display: none;
+        position: absolute;
+        top: 3.2rem;
+        left: 7rem;
+        width: calc(100% - 7rem);
+        background: white;
+        border-radius: 0.7rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+        z-index: 10;
+    }
+
+
+
+
+    .bank-options div {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.6rem;
+        cursor: pointer;
+    }
+
+    .bank-options img {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .bank-options div:hover {
+        background: #f3e8ff;
+    }
+
+    .show {
+        display: block;
+    }
+
+    .face-reg {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 1.5rem;
+    }
+
+    /* ✅ RESPONSIVE VIDEO */
+    video {
+        width: 100%;
+        max-width: 20rem;
+        aspect-ratio: 4 / 3;
+        border-radius: 0.7rem;
+        border: 0.15rem solid #7B2CBF;
+        display: flex;
+        align-self: center;
+        margin: auto;
+    }
+
+    /* ✅ CENTERED BUTTON */
+
+    #submit,
+    #capture {
+        padding: 1rem 1rem;
+        margin: auto;
+        border-radius: 1rem;
+        color: white;
+        background: #7B2CBF;
+        font-weight: bolder;
+        cursor: pointer;
+        margin-top: 1rem;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+<body>
+    <main>
+        <div id="container" class="container">
+            <img src="./Icons/phone-pe.svg" alt="phone-pe" class="logo">
+            <div class="Name">
+                <label for="Name">Name:</label>
+                <input id="name" type="text" name="name" class="name" required>
+            </div>
+            <div class="phone-no">
+                <label for="phone-no">phone-no:</label>
+                <input id="phone" type="tel" name="phone" maxlength="12" required>
+            </div>
+            <div class="bank-select">
+                <label>Bank Name:</label>
+
+                <!-- Hidden value for form -->
+                <input type="hidden" id="bankValue" name="bank">
+
+                <!-- Selected Bank -->
+                <div class="selected" onclick="toggleBanks()">
+                    <img id="selectedImg" src="./Icons/bank.png" alt="bank">
+                    <span id="selectedName">Select Bank</span>
+                </div>
+
+                <!-- Bank Options -->
+                <div class="bank-options">
+                    <div onclick="selectBank('Airtel Payments Bank','./Icons/Airtel payemts Bank.png')">
+                        <img src="./Icons/Airtel payemts Bank.png">
+                        <span>Airtel Payments Bank</span>
+                    </div>
+
+                    <div onclick="selectBank('Bank of Baroda','./Icons/Bank of Baroda.png')">
+                        <img src="./Icons/Bank of Baroda.png">
+                        <span>Bank of Baroda</span>
+                    </div>
+
+                    <div onclick="selectBank('State Bank of India','./Icons/SBI.png')">
+                        <img src="./Icons/SBI.png">
+                        <span>State Bank of India</span>
+                    </div>
+
+                    <div onclick="selectBank('Bank of India','./Icons/Bank of india.jpg')">
+                        <img src="./Icons/Bank of india.jpg">
+                        <span>Bank of India</span>
+                    </div>
+
+                    <div onclick="selectBank('Canara Bank','./Icons/Canara Bank.png')">
+                        <img src="./Icons/Canara Bank.png">
+                        <span>Canara Bank</span>
+                    </div>
+
+                    <div onclick="selectBank('Central Bank of India','./Icons/Central bank of india.png')">
+                        <img src="./Icons/Central bank of india.png">
+                        <span>Central Bank of India</span>
+                    </div>
+
+                    <div onclick="selectBank('HDFC Bank','./Icons/HDFC Bank.png')">
+                        <img src="./Icons/HDFC Bank.png">
+                        <span>HDFC Bank</span>
+                    </div>
+
+                    <div onclick="selectBank('Punjab National Bank','./Icons/Punjab national bank.jpg')">
+                        <img src="./Icons/Punjab national bank.jpg">
+                        <span>Punjab National Bank</span>
+                    </div>
+
+                    <div onclick="selectBank('Union Bank of India','./Icons/union bank.png')">
+                        <img src="./Icons/union bank.png">
+                        <span>Union Bank of India</span>
+                    </div>
+                </div>
+            </div>
+            <button id="submit" type="button">submit</button>
+        </div>
+        <div id="faceSection" style="display:none;">
+            <video id="video" autoplay muted></video>
+            <canvas id="canvas"></canvas>
+            <br>
+            <button id="capture">Capture Face</button>
+        </div>
+
+    </main>
+
+    <script>
+        function toggleBanks() {
+            document.querySelector(".bank-options").classList.toggle("show");
+        }
+        function selectBank(name, img) {
+            document.getElementById("selectedName").innerText = name;
+            document.getElementById("selectedImg").src = img;
+            document.getElementById("bankValue").value = name;
+            document.querySelector(".bank-options").classList.remove("show");
+        }
+        document.addEventListener("click", function (e) {
+            if (!e.target.closest(".bank-select")) {
+                document.querySelector(".bank-options").classList.remove("show");
+            }
+        });
+
+
+        const submit = document.getElementById('submit');
+        const container = document.getElementById('container');
+        const faceSection = document.getElementById('faceSection');
+        const video = document.getElementById('video');
+
+        let userdata = {};
+        submit.addEventListener("click", async () => {
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const bank = document.getElementById('bankValue').value.trim();
+            if (!name || !phone || !bank) {
+                alert("Fill all details");
+                return;
+            }
+            userdata = { name, phone, bank };
+            console.log('UserData', userdata);
+            container.style.display = "none";
+            faceSection.style.display = "block";
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+        });
+
+        async function loadmodels() {
+            await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
+            await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+            await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
+        }
+        loadmodels();
+
+        const capture = document.getElementById('capture');
+        const canvas = document.getElementById('canvas');
+
+        capture.addEventListener("click", async () => {
+            const detection = await faceapi
+                .detectSingleFace(video)
+                .withFaceLandmarks()
+                .withFaceDescriptor();
+            if (!detection) {
+                alert("Face not detected Try again")
+            }
+            const faceDescriptor = Array.from(detection.descriptor)
+            await data(faceDescriptor);
+        });
+        async function data(faceDescriptor) {
+            try {
+                const res = await fetch("http://localhost:1290/register", {
+                    method: "POST",
+                    headers: { "content-Type": "application/json" },
+                    body: JSON.stringify({
+                        ...userdata,
+                        faceDescriptor
+                    })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alert("Face registered successfully");
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Server error");
+            }
+        }
+    </script>
+</body>
+
+</html>

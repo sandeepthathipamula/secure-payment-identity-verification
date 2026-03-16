@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhonePe: UPI Payments, Investment, Insurance, Recharges, DTH &amp; More</title>
+    <link rel="shortcut icon" href="./Icons/logo.webp" class="logo" type="image/x-icon">
+</head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    main {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container {
+        width: clamp(18rem, 90vw, 28rem);
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        border: 0.15rem solid #7B2CBF;
+        border-radius: 1rem;
+        padding: 1.2rem;
+        text-align: center;
+    }
+
+    .container b {
+        font-size: clamp(0.9rem, 2.5vw, 1.6rem);
+    }
+
+    .container p {
+        font-size: clamp(0.7rem, 2vw, 1.1rem);
+    }
+
+    .upi {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.8rem;
+        border: 0.1rem solid black;
+        border-radius: 1rem;
+        gap: 0.5rem;
+    }
+
+    .upi label {
+        font-weight: 800;
+        font-size: clamp(0.7rem, 2vw, 1rem);
+    }
+
+    .upi button {
+        background: none;
+        color: #7B2CBF;
+        font-weight: bold;
+        border: none;
+        font-size: clamp(0.8rem, 2vw, 1rem);
+        cursor: pointer;
+    }
+
+    .UPI {
+        width: clamp(4rem, 20vw, 7rem);
+        height: auto;
+        margin: 0 auto;
+    }
+
+    .refer {
+        display: flex;
+        justify-content: center;
+    }
+
+    #Refer {
+        background: #7B2CBF;
+        color: white;
+        padding: 0.9rem 1.2rem;
+        border: none;
+        border-radius: 1rem;
+        font-weight: bold;
+        font-size: clamp(0.8rem, 2vw, 1rem);
+        cursor: pointer;
+    }
+</style>
+
+<body>
+    <main>
+        <div class="container">
+            <b>All Set for UPI payments</b>
+            <p>you can send and receive with these bank accounts</p>
+            <div class="upi">
+                <label for="upi pin">UPI pin is not set for this account</label>
+                <button id="SetPIN" type="button">Set PIN</button>
+            </div>
+            <div class="bank-list" id="bankList"></div>
+            <img src="./Icons/UPI.png" alt="upi" class="UPI">
+            <div class="refer">
+                <button id="Refer" type="button">Send ₹1 to a fFriend</button>
+            </div>
+        </div>
+    </main>
+    <script>
+        const phone = localStorage.getItem("Userphone");
+        console.log('userphone:', phone);
+
+        const SetPIN = document.getElementById('SetPIN');
+        SetPIN.addEventListener("click", async () => {
+            const pin = prompt("Enter a 4-digit PIN");
+            // If user clicks Cancel
+            if (pin === null) {
+                return;
+            }
+            // Remove spaces
+            const cleanPin = pin.trim();
+           const phone = localStorage.getItem("Userphone");
+            console.log('Phone:', phone);
+
+            // Validate exactly 4 digits
+            if (!/^\d{4}$/.test(cleanPin)) {
+                alert("Invalid PIN. Please enter exactly 4 digits.");
+                return;
+            }
+            // Success
+           
+            localStorage.setItem("userPIN", cleanPin);// Navigate next
+            try {
+                const res = await fetch("http://localhost:1300/set-upi-pin", {
+                    method: "POST",
+                    headers: { "content-Type": "application/json" },
+                    body: JSON.stringify({
+                        phone: phone,
+                        upiPin: cleanPin
+                    })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alert("Upi pin set sucessfully");
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Server error");
+            }
+            window.location.href = "card.html";
+        });
+    </script>
+</body>
+
+</html>
