@@ -19,7 +19,8 @@ A web-based prototype security system designed to improve the safety of mobile p
 
 ## Concept
 The system introduces an additional security layer for mobile payments by verifying transactions that exceed a predefined limit.
-
+#Real Architecture
+User → Camera → Face Detection → Backend (Node.js) → Verification → Payment Approval
 ## Future Improvements
 - Face verification integration
 - Fraud detection logic
